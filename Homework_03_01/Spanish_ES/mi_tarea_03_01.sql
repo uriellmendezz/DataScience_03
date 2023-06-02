@@ -14,14 +14,13 @@ create table CanalVenta(
 );
 
 create table empleados(
-	IdEmpleado int not null,
+	IdEmpleado int not null primary key,
     Nombre varchar(50),
     Apellido varchar(50),
     Sucursal varchar (70),
     Sector varchar(50),
     Cargo varchar(50),
-    Salario decimal(10,2),
-    primary key (IdEmpleado)
+    Salario decimal(10,2)
 );
 
 create table productos(
@@ -134,7 +133,77 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
-use empresa;
 
-drop table empleados;
+-- Tabla compras
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Compra.csv'
+into table compras
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
 
+
+-- Tabla gasto
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Gasto.csv'
+into table gasto
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
+
+-- Tabla proveedores
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Proveedores_csv.csv'
+into table proveedores
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
+
+-- Tabla sucursales
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Sucursales_clean.csv'
+into table sucursales
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
+
+-- Tabla tipodegasto
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/TiposDeGasto.csv'
+into table tipodegasto
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
+
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Empleados_clean.csv'
+into table empleados
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
+
+create table venta(
+	IdVenta int not null AUTO_INCREMENT primary key,
+    Fecha date,
+    Fecha_Entrega date,
+    IdCanal int ,
+    IdCliente int,
+    IdSucursal int,
+    IdEmpleado int,
+    IdProducto int,
+    Precio decimal(15,2),
+    Cantidad int,
+    foreign key (IdCanal) references canalventa (IdCanal),
+    foreign key (IdCliente) references clientes (IdCliente),
+    foreign key (IdSucursal) references sucursales (IdSucursal),
+    foreign key (IdEmpleado) references empleados (IdEmpleado),
+    foreign key (IdProducto) references productos (IdProducto)
+);
+
+-- Tabla ventas
+load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Venta.csv'
+into table venta
+fields terminated by ","
+-- enclosed by '"'
+lines TERMINATED BY "\n"
+ignore 1 lines;
