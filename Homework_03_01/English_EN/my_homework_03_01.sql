@@ -1,12 +1,12 @@
 
 ## Homework Clase 01 - M3
 
-# Creo la base de datos
+# I create the database
 create database empresa;
 use empresa;
 
 /*
-Creación de las tablas
+Creating the tables
 */
 
 create table CanalVenta(
@@ -118,17 +118,17 @@ create table venta(
 
 
 /*
-Comenzamos con la inserción de la data
+Once I have all the tables, lets go ahead to insert the values into the tables
 */
 
--- Tabla canalventa
+-- Table 'canalventa' (sales channel)
 load data infile "C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/CanalDeVenta_csv.csv"
 into table canalventa
 fields terminated by ","
 LINES TERMINATED BY '\n'
 ignore 1 lines;
 
--- Tabla clientes
+-- Table 'clientes' (clients)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/clientes_clean.csv'
 into table clientes
 fields terminated by ","
@@ -136,7 +136,7 @@ enclosed by '"'
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla productos
+-- Table 'productos' (products)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Productos_csv.csv'
 into table productos
 fields terminated by ","
@@ -144,15 +144,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla empleados
-load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Empleados_csv.csv'
-into table empleados
-fields terminated by ","
--- enclosed by '"'
-lines TERMINATED BY "\n"
-ignore 1 lines;
-
--- Tabla compras
+-- Table 'compras'(purchases)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Compra.csv'
 into table compras
 fields terminated by ","
@@ -160,7 +152,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla gasto
+-- Table 'gasto' (expense)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Gasto.csv'
 into table gasto
 fields terminated by ","
@@ -168,7 +160,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla proveedores
+-- Table 'proveedores' (providers)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Proveedores_csv.csv'
 into table proveedores
 fields terminated by ","
@@ -176,7 +168,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla sucursales
+-- Table 'sucursales' (branches)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Sucursales_clean.csv'
 into table sucursales
 fields terminated by ","
@@ -184,7 +176,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla tipodegasto
+-- Table 'tipodegasto' (expense type)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/TiposDeGasto.csv'
 into table tipodegasto
 fields terminated by ","
@@ -192,7 +184,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla 'empleados'
+-- Table 'empleados' (employees)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Empleados_clean.csv'
 into table empleados
 fields terminated by ","
@@ -200,7 +192,7 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
--- Tabla 'venta'
+-- Tabla 'venta' (sales)
 load data infile 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/Homework_clase_1_m3/Venta.csv'
 into table venta
 fields terminated by ","
@@ -208,4 +200,4 @@ fields terminated by ","
 lines TERMINATED BY "\n"
 ignore 1 lines;
 
-# Finalmente, todas las tablas fueron creadas y se les insertó sus respectivos datos
+# Finally, all the tables were created and their respective data were inserted into them successfully!
