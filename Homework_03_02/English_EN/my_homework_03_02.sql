@@ -1,21 +1,21 @@
 use empresa;
 
 /* # 1
-¿Qué tan actualizada está la información? 
-¿La forma en que se actualiza ó mantiene esa información se puede mejorar?
+How up to date is the information?
+Can the way in which this information is updated or maintained be improved?
 */
--- Consulto que tablas contiene una columna de fecha
+-- I check wich tables conteins a date column
 select distinct table_name from information_schema.columns
 where table_schema = "empresa"
 and column_name like "%fecha%";
 
--- Aparentemente la tabla 'clientes' contiene datos desactualizados, datos del 2015
+-- Apparently the 'clientes' (clients) table contains outdated data, data from 2015
 select Fecha_Alta,Fecha_Ultima_Modificacion from clientes order by 1,2 desc;
 
--- Tabla 'compras' se podria considerar actualizada dentro de todo, ya que sus datos van del '2015-01-30' al '2020-12-25'.
+-- Table 'compras' could be considered updated within everything, since its data goes from '2015-01-30' to '2020-12-25'.
 select min(Fecha) as 'Oldest date', max(fecha) as 'Newest date' from compras limit 1;
 
--- La tabla 'venta' se encuentra con datos bastente recientes que van del 2015-01-01 a 2021-01-06
+-- The table 'ventas' is found with fairly recent data ranging from 2015-01-01 to 2021-01-06
 describe venta;
 select min(Fecha),max(fecha_entrega) from venta; 
 
@@ -229,12 +229,169 @@ where table_schema = 'empresa'
 and table_name = 'venta'
 and column_name = 'Precio';
 
-select precio, length(precio) from venta order by 2 desc;
 
-select length(precio) as len, count(*) from venta group by 1 order by 2 desc;
+select length(precio) as len, precio from venta group by 2 order by 2 desc;
 
+-- limpieza para la columna precio. Seteando todos los valores maximos a 4 digitos a 4 digitos con dos decimales
+
+update venta
+set precio =
+case
+	when precio not like '%.%' and length(precio) = 8 then format(precio/10000,2)
+	when precio not like '%.%' and length(precio) = 7 then format(precio/1000,2)
+	when precio not like '%.%' and length(precio) = 6 then format(precio/100,2)
+	when precio not like '%.%' and length(precio) = 5 then format(precio/10,2)
+	else precio
+end;
+
+-- Agrego '.00' a los numeros enteros para convertirlos en decimales
+update venta
+set precio = concat(precio, '.00')
+where precio not like '%.%';
+
+-- Elimino las comas de los valores que la tienen
+update venta
+set precio = replace(precio,',','')
+where precio like '%,%';
+
+-- Agrego un 0 al ultimo para los numeros que tienen solo un decimal
+update venta
+set precio = concat(precio, '0')
+WHERE LENGTH(SUBSTRING_INDEX(precio, '.', -1)) = 1;
+
+
+-- Veo como quedaron los cambios
+select DISTINCT length(precio) as Len, precio from venta group by 1,2 order by 1;
+
+## Por seguridad,en vez de hacer un MODIFY COLUMN a decimal, creamos una nueva columna de tipo decimal 
+## para insertar todos los valores de la columna precio.
+
+alter table venta
+add precio_decimal decimal(10,2);
+
+update venta
+set precio_decimal = cast(precio as decimal(10,2));
+
+-- Visualizo como quedo la nueva columna
+select IdVenta, precio, precio_decimal from venta;
+
+-- Una vez que tenemos la nueva columna creada y asegurado de que se copiaron bien los datos, procedo a eliminar la columna vieja 'precio'
+alter table venta
+drop column precio;
+
+alter table venta
+rename column precio_decimal to Precio;
+
+select * from venta limit 5;
 
 -- La columna 'cantidad' tiene valores nulos, asi que los remplazaré a 0
 update venta
 set Cantidad = 0
 where cantidad = " " or isnull(cantidad);
+
+select distinct cantidad from venta;
+
+/* # 13
+Generar dos nuevas tablas a partir de la tabla 'empelado' que contengan las entidades Cargo y Sector.
+*/
+select * from empleados limit 5;
+
+create table Sector(
+	IdSector int not null auto_increment primary key,
+    TipoSector varchar(70)
+);
+
+create table Cargo(
+	IdCargo int not null auto_increment primary key,
+    TipoCargo varchar(70)
+);
+
+insert into sector (TipoSector)
+select distinct sector from empleados;
+
+insert into cargo (TipoCargo)
+select distinct cargo from empleados;
+
+select * from sector;
+select * from cargo;
+
+-- Creo las tablas IdSector y IdCargo en la tabla empleados
+alter table empleados
+add column IdCargo int,
+add column IdSector int,
+add foreign key (IdCargo) references Cargo (IdCargo),
+add foreign key (IdSector) references Sector (IdSector);
+
+select * from empleados limit 5;
+
+-- Actualizo los datos de las nuevas columnas
+update empleados e
+join cargo c
+on e.Cargo = c.TipoCargo
+set e.IdCargo = c.IdCargo;
+
+update empleados e
+join sector s
+on e.Sector = s.TipoSector
+set e.IdSector = s.IdSector;
+
+select distinct cargo, sector, idcargo, idsector from empleados;
+
+-- Elimino las columnas Cargo y Sector y dejo sus respectivos Id'SAVEPOINT
+alter table empleados
+drop column cargo,
+drop column sector;
+
+select * from empleados limit 10;
+
+/* # 14
+Generar una nueva tabla a partir de la tabla 'producto' que contenga la entidad Tipo de Producto.
+*/
+
+select * from productos limit 5;
+
+create table TipoProducto(
+	IdTipoProducto int not null auto_increment primary key,
+    Tipo varchar(70)
+);
+
+insert into TipoProducto (Tipo)
+select distinct tipo from productos;
+
+select * from tipoproducto;
+
+-- Agrego la columna IdTipoProducto a la tabla productos
+alter table productos
+add column IdTipoProducto int,
+add foreign key (IdTipoProducto) references TipoProducto (IdTipoProducto);
+
+-- Inserto los ids para la nueva columna
+update productos p
+join tipoproducto tp
+on p.Tipo = tp.Tipo
+set p.IdTipoProducto = tp.IdTipoProducto;
+
+-- Elimino la columna Tipo ya que ahora es innecesaria
+alter table productos
+drop column tipo;
+
+select * from productos;
+
+/* Extra 
+crear una columna llamada 'IdSucursal' para la tabla 'empleados' 
+*/
+select distinct table_name
+from information_schema.columns
+where table_schema = 'empresa'
+and column_name like '%Sucursal%';
+
+alter table empleados
+add column IdSucursal int,
+add foreign key (IdSucursal) references sucursales (IdSucursal);
+
+update empleados e
+join sucursales s
+on e.Sucursal = s.Sucursal
+set e.IdSucursal = s.IdSucursal;
+
+
